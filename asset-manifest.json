@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/stream-flows/static/css/main.d1010120.css",
-    "main.js": "/stream-flows/static/js/main.680f332d.js",
+    "main.js": "/stream-flows/static/js/main.aa2e2dcd.js",
     "index.html": "/stream-flows/index.html",
     "main.d1010120.css.map": "/stream-flows/static/css/main.d1010120.css.map",
-    "main.680f332d.js.map": "/stream-flows/static/js/main.680f332d.js.map"
+    "main.aa2e2dcd.js.map": "/stream-flows/static/js/main.aa2e2dcd.js.map"
   },
   "entrypoints": [
     "static/css/main.d1010120.css",
-    "static/js/main.680f332d.js"
+    "static/js/main.aa2e2dcd.js"
   ]
 }
