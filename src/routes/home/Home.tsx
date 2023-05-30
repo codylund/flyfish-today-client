@@ -15,7 +15,9 @@ export const Home: FC = props => {
   const [flows, setFlows]: [FlowSeries[], (posts: FlowSeries[]) => void] = React.useState(defaultFlows)
   const [lookback, setLookback]: [number, (lookback: number) => void] = React.useState(7)
   const [searchParams, setSearchParams] = useSearchParams()
-  const [sites, setSites]: [string[], (sites: string[]) => void] = React.useState<string[]>(searchParams.getAll('site'))
+
+  // Init sites from latest URL query params.
+  const sites = searchParams.getAll('site')
 
   React.useEffect(() => {
     if (sites.length > 0) {
@@ -27,12 +29,11 @@ export const Home: FC = props => {
           console.error('Flow lookup failed.', e.stack)
         })
     }
-  }, [lookback, sites])
+  }, [lookback, searchParams])
 
   const onSiteAdded = (site: string): void => {
     searchParams.append('site', site)
     setSearchParams(new URLSearchParams(searchParams.toString()))
-    setSites([...sites, site])
   }
 
   let columns = 12
