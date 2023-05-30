@@ -3,6 +3,9 @@ import Select, { type SelectChangeEvent } from '@mui/material/Select'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import { IconButton } from '@mui/material'
+import { Link } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
@@ -22,7 +25,10 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
     <Box sx={{ width: '100%', flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
+          <IconButton component={Link} to="https://github.com/codylund/stream-flows">
+            <GitHubIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
             Flows
           </Typography>
           <FormControl>
