@@ -5,6 +5,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import { Link } from '@mui/material'
 import TextField from '@mui/material/TextField'
 
 export interface AddSiteDialogProps {
@@ -25,7 +26,7 @@ export const AddSiteDialog: FC<AddSiteDialogProps> = ({ open, onSiteAdded, onClo
       <DialogTitle>Add site</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Add a USGS site to the dashboard. Sites can be found <a href="https://maps.waterdata.usgs.gov/mapper/index.html">here</a>.
+          Sites can be found at <Link href="https://maps.waterdata.usgs.gov/mapper/index.html" target="_blank" rel="noreferrer">maps.waterdata.usgs.gov</Link>.
         </DialogContentText>
         <TextField
           autoFocus

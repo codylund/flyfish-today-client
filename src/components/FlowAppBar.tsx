@@ -25,7 +25,7 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
     <Box sx={{ width: '100%', flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton component={Link} to="https://github.com/codylund/stream-flows">
+          <IconButton component={Link} to="https://github.com/codylund/stream-flows" target="_blank" rel="noreferrer">
             <GitHubIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
