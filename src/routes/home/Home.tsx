@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper'
 import { isMobile } from 'react-device-detect'
 import { useSearchParams } from 'react-router-dom'
 
-export const Home: FC = props => {
+export const Home: FC = () => {
   const defaultFlows: FlowSeries[] = []
   const [flows, setFlows]: [FlowSeries[], (posts: FlowSeries[]) => void] = React.useState(defaultFlows)
   const [lookback, setLookback]: [number, (lookback: number) => void] = React.useState(7)

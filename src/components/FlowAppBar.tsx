@@ -2,13 +2,13 @@ import React, { type FC } from 'react'
 import Select, { type SelectChangeEvent } from '@mui/material/Select'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
+import { FlowNavigationDrawer } from './FlowNavigationDrawer'
 import FormControl from '@mui/material/FormControl'
-import GitHubIcon from '@mui/icons-material/GitHub'
 import { IconButton } from '@mui/material'
-import { Link } from 'react-router-dom'
 import MenuItem from '@mui/material/MenuItem'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
+import WaterIcon from '@mui/icons-material/Water'
 
 export interface FlowAppBarProps {
   lookback: number
@@ -16,17 +16,33 @@ export interface FlowAppBarProps {
 }
 
 export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated }) => {
+  const [navigationOpen, setNavigationOpen] = React.useState(false)
+
   const handleChange = (event: SelectChangeEvent): void => {
     const newLookback: number = +event.target.value
     onLookbackUpdated(newLookback)
   }
 
+  const closeDrawer = () =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+      if (
+        event.type === 'keydown' &&
+      ((event as React.KeyboardEvent).key === 'Tab' ||
+        (event as React.KeyboardEvent).key === 'Shift')
+      ) {
+        return
+      }
+
+      setNavigationOpen(false)
+    }
+
   return (
-    <Box sx={{ width: '100%', flexGrow: 1 }}>
+    <Box
+      sx={{ width: '100%', flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton component={Link} to="https://github.com/codylund/stream-flows" target="_blank" rel="noreferrer">
-            <GitHubIcon />
+          <IconButton onClick={() => { setNavigationOpen(true) }}>
+            <WaterIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
             Flows
@@ -48,6 +64,12 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
           </FormControl>
         </Toolbar>
       </AppBar>
+      <Box
+        role="presentation"
+        onClick={closeDrawer()}
+        onKeyDown={closeDrawer()}>
+        <FlowNavigationDrawer open={navigationOpen} />
+      </Box>
     </Box>
   )
 }
