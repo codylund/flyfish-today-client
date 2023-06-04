@@ -1,9 +1,9 @@
 import React, { type FC } from 'react'
-import { AddSiteButton } from '../../components/AddSiteButton'
+import { AddSiteButton } from '../../components/dialogs/add-site/AddSiteButton'
 import Box from '@mui/material/Box'
-import { FlowAppBar } from '../../components/FlowAppBar'
-import { FlowChart } from '../../components/FlowChart'
-import { type FlowSeries } from '../../services/flows/FlowSeries'
+import { FlowAppBar } from '../../components/navigation/FlowAppBar'
+import { FlowChart } from '../../components/charts/FlowChart'
+import { type FlowSeries } from '../../models/FlowSeries'
 import Grid from '@mui/material/Grid'
 import { LoadFlows } from '../../services/flows/FlowService'
 import Paper from '@mui/material/Paper'
@@ -11,9 +11,8 @@ import { isMobile } from 'react-device-detect'
 import { useSearchParams } from 'react-router-dom'
 
 export const Home: FC = () => {
-  const defaultFlows: FlowSeries[] = []
-  const [flows, setFlows]: [FlowSeries[], (posts: FlowSeries[]) => void] = React.useState(defaultFlows)
-  const [lookback, setLookback]: [number, (lookback: number) => void] = React.useState(7)
+  const [flows, setFlows] = React.useState([] as FlowSeries[])
+  const [lookback, setLookback] = React.useState(7)
   const [searchParams, setSearchParams] = useSearchParams()
 
   // Init sites from latest URL query params.

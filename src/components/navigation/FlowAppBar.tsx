@@ -45,7 +45,7 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
             <WaterIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            Flows
+            CO Streamflow
           </Typography>
           <FormControl>
             <Select

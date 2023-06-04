@@ -1,4 +1,6 @@
-import { type FlowDataPoint, type FlowSeries } from './FlowSeries'
+import { type FlowDataPoint } from '../../models/FlowDataPoint'
+import { type FlowSeries } from '../../models/FlowSeries'
+import { type SiteInfo } from '../../models/SiteInfo'
 import axios from 'axios'
 
 interface QueryCriteria {
@@ -141,8 +143,6 @@ export async function LoadFlows (lookbackDays: number, sites: string[]): Promise
   const result = await axios.get<JSONBlob>(
     'https://waterservices.usgs.gov/nwis/iv/',
     {
-      baseURL: 'https://waterservices.usgs.gov/',
-      url: 'nwis/iv/',
       params: {
         format: 'json',
         sites: sites.join(','),
@@ -181,4 +181,47 @@ export async function LoadFlows (lookbackDays: number, sites: string[]): Promise
 
   // Return the flows.
   return flows
+}
+
+export async function LoadActiveSites (): Promise<SiteInfo[]> {
+  const result = await axios.get<JSONBlob>(
+    'https://waterservices.usgs.gov/nwis/dv/',
+    {
+      params: {
+        format: 'json',
+        // Colorado only
+        stateCd: 'co',
+        // Active streams
+        siteType: 'ST',
+        siteStatus: 'active',
+        // Include sites that have reported data in the past 7 days
+        period: 'P7D'
+      }
+    }
+  )
+
+  if (result.status !== 200) {
+    throw new Error(`Failed to get flow data. Code: ${result.status}`)
+  }
+
+  return result.data.value.timeSeries.filter((series) => {
+    // The USGS API may return sites that aren't reporting live flow data...
+    // If there are no data points, filter out the site.
+    return series.values[0].value.length > 0
+  }).map((series) => {
+    const geogLocation = series.sourceInfo.geoLocation.geogLocation
+    const sourceInfo = series.sourceInfo
+    return {
+      name: sourceInfo.siteName,
+      id: sourceInfo.siteCode[0].value,
+      lat: geogLocation.latitude,
+      lon: geogLocation.longitude
+    }
+  }).filter((obj, index, array) =>
+    array.findIndex(o =>
+      o.id === obj.id
+    ) === index
+  ).sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
 }

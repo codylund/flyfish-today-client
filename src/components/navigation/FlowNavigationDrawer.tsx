@@ -1,4 +1,4 @@
-import '../App.css'
+import '../../App.css'
 import { Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Typography } from '@mui/material'
 import React, { type FC } from 'react'
 import Drawer from '@mui/material/Drawer'

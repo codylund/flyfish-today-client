@@ -1,6 +1,7 @@
 import { type AxisOptions, Chart } from 'react-charts'
-import { type FlowDataPoint, type FlowSeries } from '../services/flows/FlowSeries'
 import React, { type FC } from 'react'
+import { type FlowDataPoint } from '../../models/FlowDataPoint'
+import { type FlowSeries } from '../../models/FlowSeries'
 
 interface FlowChartProps {
   flow: FlowSeries
