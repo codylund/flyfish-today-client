@@ -194,6 +194,8 @@ export async function LoadActiveSites (): Promise<SiteInfo[]> {
         // Active streams
         siteType: 'ST',
         siteStatus: 'active',
+        // Code for cfs.
+        parameterCd: '00060',
         // Include sites that have reported data in the past 7 days
         period: 'P7D'
       }
