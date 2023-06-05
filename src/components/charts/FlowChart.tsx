@@ -39,7 +39,8 @@ export const FlowChart: FC<FlowChartProps> = ({ flow }) => {
         primaryAxis,
         secondaryAxes,
         dark: true,
-        padding: 24
+        padding: 24,
+        tooltip: false
       }}
     />
   )
