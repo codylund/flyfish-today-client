@@ -170,9 +170,6 @@ export async function LoadFlows (lookbackDays: number, sites: string[]): Promise
     // For each value in the series, pull the time and CFS.
     series.values[0].value.forEach(value => {
       const time: Date = new Date(value.dateTime)
-      // We are in MDT. React Charts only renders in UTC time, so just subtract 6 hours
-      // to make it match MDT.
-      time.setHours(time.getHours() - 6)
       const cfs: number = +value.value
       data.push({ time, cfs })
     })

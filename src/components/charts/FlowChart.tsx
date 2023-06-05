@@ -11,7 +11,9 @@ interface FlowChartProps {
 export const FlowChart: FC<FlowChartProps> = ({ flow }) => {
   const primaryAxis = React.useMemo(
     (): AxisOptions<FlowDataPoint> => ({
-      getValue: datum => datum.time
+      getValue: datum => datum.time,
+      // Use local time, not UTC time.
+      scaleType: 'localTime'
     }),
     []
   )
