@@ -3,13 +3,28 @@ import { Link, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListS
 import React, { type FC } from 'react'
 import Drawer from '@mui/material/Drawer'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import LogoutIcon from '@mui/icons-material/Logout'
+import { SignOut } from '../../services/UserService'
 import SportsBarIcon from '@mui/icons-material/SportsBar'
+import { useNavigate } from 'react-router-dom'
 
 export interface FlowNavigationDrawerProps {
   open: boolean
 }
 
 export const FlowNavigationDrawer: FC<FlowNavigationDrawerProps> = ({ open }) => {
+  const navigate = useNavigate()
+
+  const onSignOut = (): void => {
+    SignOut()
+      .then(_ => {
+        navigate('/signin')
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
   return (
     <Drawer
       anchor='left'
@@ -29,6 +44,14 @@ export const FlowNavigationDrawer: FC<FlowNavigationDrawerProps> = ({ open }) =>
               <SportsBarIcon />
             </ListItemIcon>
             <ListItemText primary={<Typography variant='body1'>Buy me a beer</Typography>} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton onClick={onSignOut}>
+            <ListItemIcon>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText primary={<Typography variant='body1'>Logout</Typography>} />
           </ListItemButton>
         </ListItem>
       </List>

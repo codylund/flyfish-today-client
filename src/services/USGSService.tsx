@@ -1,6 +1,7 @@
-import { type FlowDataPoint } from '../../models/FlowDataPoint'
-import { type FlowSeries } from '../../models/FlowSeries'
-import { type SiteInfo } from '../../models/SiteInfo'
+import { type FlowDataPoint } from '../models/usgs/FlowDataPoint'
+import { type FlowSeries } from '../models/usgs/FlowSeries'
+import { type Site } from '../models/api/Site'
+import { type SiteInfo } from '../models/usgs/SiteInfo'
 import axios from 'axios'
 
 interface QueryCriteria {
@@ -138,14 +139,14 @@ interface JSONBlob {
   }
 }
 
-export async function LoadFlows (lookbackDays: number, sites: string[]): Promise<FlowSeries[]> {
+export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<FlowSeries[]> {
   // Query the latest flows.
   const result = await axios.get<JSONBlob>(
     'https://waterservices.usgs.gov/nwis/iv/',
     {
       params: {
         format: 'json',
-        sites: sites.join(','),
+        sites: sites.map(site => site.site_id).join(','),
         // Code for cfs.
         parameterCd: '00060',
         siteStatus: 'all',
@@ -163,6 +164,8 @@ export async function LoadFlows (lookbackDays: number, sites: string[]): Promise
 
   // For each series in the response.
   result.data.value.timeSeries.forEach(series => {
+    const siteId = series.sourceInfo.siteCode[0].value
+    console.log(`Loaded site with id: ${siteId}`)
     // Pull the site name for the label.
     const label = series.sourceInfo.siteName
     // Create array to hold all the data points.
@@ -173,7 +176,7 @@ export async function LoadFlows (lookbackDays: number, sites: string[]): Promise
       const cfs: number = +value.value
       data.push({ time, cfs })
     })
-    flows.push({ location: label, data })
+    flows.push({ siteId, location: label, data })
   })
 
   // Return the flows.

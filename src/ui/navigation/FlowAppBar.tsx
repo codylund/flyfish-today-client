@@ -1,10 +1,12 @@
+import { Divider, IconButton } from '@mui/material'
+import { FilterAlt, FilterAltOutlined } from '@mui/icons-material'
 import React, { type FC } from 'react'
 import Select, { type SelectChangeEvent } from '@mui/material/Select'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
+import { FilterMenu } from '../filter/FilterMenu'
 import { FlowNavigationDrawer } from './FlowNavigationDrawer'
 import FormControl from '@mui/material/FormControl'
-import { IconButton } from '@mui/material'
 import MenuItem from '@mui/material/MenuItem'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
@@ -17,6 +19,7 @@ export interface FlowAppBarProps {
 
 export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated }) => {
   const [navigationOpen, setNavigationOpen] = React.useState(false)
+  const [showFilters, setShowFilters] = React.useState(false)
 
   const handleChange = (event: SelectChangeEvent): void => {
     const newLookback: number = +event.target.value
@@ -37,9 +40,8 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
     }
 
   return (
-    <Box
-      sx={{ width: '100%', flexGrow: 1 }}>
-      <AppBar position="static">
+    <Box sx={{ width: '100%', flexGrow: 1 }}>
+      <AppBar variant='outlined' elevation={0} position="static">
         <Toolbar>
           <IconButton onClick={() => { setNavigationOpen(true) }}>
             <WaterIcon />
@@ -47,6 +49,9 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
             CO Streamflow
           </Typography>
+          <IconButton onClick={() => { setShowFilters(!showFilters) }}>
+            { showFilters ? <FilterAlt /> : <FilterAltOutlined /> }
+          </IconButton>
           <FormControl>
             <Select
               labelId="demo-simple-select-label"
@@ -63,6 +68,14 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
             </Select>
           </FormControl>
         </Toolbar>
+        {
+          showFilters && (
+            <Box>
+              <Divider />
+              <FilterMenu />
+            </Box>
+          )
+        }
       </AppBar>
       <Box
         role="presentation"

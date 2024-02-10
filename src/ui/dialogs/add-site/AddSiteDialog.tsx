@@ -8,8 +8,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Link from '@mui/material/Link'
-import { LoadActiveSites } from '../../../services/flows/FlowService'
-import { type SiteInfo } from '../../../models/SiteInfo'
+import { LoadActiveSites } from '../../../services/USGSService'
+import { type SiteInfo } from '../../../models/usgs/SiteInfo'
 import TextField from '@mui/material/TextField'
 
 export interface AddSiteDialogProps {
