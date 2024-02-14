@@ -9,7 +9,12 @@ interface TagsProps {
 }
 
 export const Tags: FC<TagsProps> = ({ site, onTagsUpdated }) => {
-  const [tags, setTags] = React.useState(site.tags ?? [])
+  let tagsInit = site.tags ?? []
+  tagsInit = tagsInit
+    .filter((tag, idx) => tagsInit.indexOf(tag) === idx)
+    .filter((tag) => tag != null && tag.length > 0)
+
+  const [tags, setTags] = React.useState(tagsInit)
   const [isAddingTag, setAddingTag] = React.useState(false)
   const [newTag, setNewTag] = React.useState('')
 
@@ -86,11 +91,13 @@ export const Tags: FC<TagsProps> = ({ site, onTagsUpdated }) => {
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    const newTags = tags.concat([newTag])
-                    setTags(newTags)
+                    if (!tags.includes(newTag)) {
+                      const newTags = tags.concat([newTag])
+                      setTags(newTags)
+                      onTagsUpdated(newTags)
+                    }
                     setAddingTag(false)
                     setNewTag('')
-                    onTagsUpdated(newTags)
                   }
                 }} />)
         }

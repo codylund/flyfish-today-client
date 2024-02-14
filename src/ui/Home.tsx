@@ -160,10 +160,16 @@ export const Home: FC = () => {
   let columns = 12
   if (isMobile) { columns = 1 }
 
-  const tags: string[] = sites
+  const rawTags: string[] = sites
     .map(site => site.tags)
     .flat()
-    .filter((tag, index) => tag != null)
+  const tags: string[] = rawTags
+    // Remove duplicates.
+    .filter((tag, idx) => rawTags.indexOf(tag) === idx)
+    // Remove null/empty tags.
+    .filter((tag) => tag != null && tag.length > 0)
+    // Sort alphabetically
+    .sort((tagA, tagB) => tagA.localeCompare(tagB))
 
   return (
     <FiltersContext.Provider value={{ filters, setFilters }}>

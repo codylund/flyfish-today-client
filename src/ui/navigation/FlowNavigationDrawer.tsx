@@ -28,6 +28,7 @@ export const FlowNavigationDrawer: FC<FlowNavigationDrawerProps> = ({ open }) =>
   return (
     <Drawer
       anchor='left'
+      elevation={0}
       open={open}>
       <List subheader={<ListSubheader sx={{ background: 'transparent' }}>Links</ListSubheader>}>
         <ListItem disablePadding>

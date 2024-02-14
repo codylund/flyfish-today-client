@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const instance = axios.create({
   withCredentials: true,
-  baseURL: 'http://localhost:8080'
+  baseURL: 'https://beta.api.coloradostreamflow.com'
 })
 
 export async function Auth (username: string, password: string): Promise<void> {

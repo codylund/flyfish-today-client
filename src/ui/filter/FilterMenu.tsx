@@ -52,12 +52,13 @@ export const FilterMenu: FC = () => {
           label="Tags"
           renderValue={(values) => values.join(', ')}
         >
-          {tags.map((tag) => (
-            <MenuItem key={tag} value={tag}>
-              <Checkbox checked={selectedTags.includes(tag)} />
-              <ListItemText primary={tag} />
-            </MenuItem>
-          ))}
+          {tags
+            .map((tag) => (
+              <MenuItem key={tag} value={tag}>
+                <Checkbox checked={selectedTags.includes(tag)} />
+                <ListItemText primary={tag} />
+              </MenuItem>
+            ))}
         </Select>
       </FormControl>
     </Box>

@@ -47,7 +47,7 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
             <WaterIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            CO Streamflow
+            Streamflows
           </Typography>
           <IconButton onClick={() => { setShowFilters(!showFilters) }}>
             { showFilters ? <FilterAlt /> : <FilterAltOutlined /> }
