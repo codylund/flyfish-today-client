@@ -1,14 +1,35 @@
+import 'chartjs-adapter-moment'
 import { Alert, Box, Divider, IconButton, Stack } from '@mui/material'
-import { type AxisOptions, Chart } from 'react-charts'
+import {
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  TimeScale,
+  Title,
+  Tooltip
+} from 'chart.js'
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 import React, { type FC } from 'react'
 import { EditMenu } from './EditMenu'
 import ErrorIcon from '@mui/icons-material/Error'
-import { type FlowDataPoint } from '../models/FlowDataPoint'
 import { FlowErrors } from '../../filters/models/FlowErrors'
 import { type FlowSeries } from '../models/FlowSeries'
+import { Line } from 'react-chartjs-2'
+
 import { type Site } from '../../user/sites/models/Site'
 import { Tags } from './Tags'
+
+ChartJS.register(
+  LinearScale,
+  PointElement,
+  LineElement,
+  TimeScale,
+  Title,
+  Tooltip,
+  Legend
+)
 
 interface FlowChartProps {
   flow: FlowSeries
@@ -28,30 +49,70 @@ export const FlowChart: FC<FlowChartProps> = ({
 }) => {
   const [isFavorite, setFavorite] = React.useState(site.is_favorite)
 
-  const primaryAxis = React.useMemo(
-    (): AxisOptions<FlowDataPoint> => ({
-      getValue: datum => datum.time,
-      // Use local time, not UTC time.
-      scaleType: 'localTime'
-    }),
-    []
-  )
-
-  const secondaryAxes = React.useMemo(
-    (): Array<AxisOptions<FlowDataPoint>> => [
-      {
-        getValue: datum => datum.cfs
+  const options = {
+    responsive: true,
+    interaction: {
+      mode: 'index' as const,
+      intersect: false
+    },
+    plugins: {
+      title: {
+        display: false,
+        text: flow.location
       }
-    ],
-    []
-  )
-
-  const data = [
-    {
-      label: flow.location,
-      data: flow.data
+    },
+    elements: {
+      point: {
+        radius: 0
+      }
+    },
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        type: 'time' as const,
+        time: {
+          unit: 'day' as const
+        },
+        title: {
+          display: true,
+          text: 'Time' as const
+        },
+        grid: {
+          drawBorder: true,
+          lineWidth: 1,
+          color: '#333333'
+        }
+      },
+      y: {
+        type: 'linear' as const,
+        display: true,
+        position: 'left' as const,
+        title: {
+          display: true,
+          text: 'CFS' as const
+        },
+        grid: {
+          drawBorder: true,
+          lineWidth: 1,
+          color: '#333333'
+        }
+      }
     }
-  ]
+  }
+
+  const labels = flow.data.map(datum => datum.time)
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'CFS',
+        data: flow.data.map(datum => datum.cfs),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        yAxisID: 'y'
+      }
+    ]
+  }
 
   return (
     <div>
@@ -86,7 +147,7 @@ export const FlowChart: FC<FlowChartProps> = ({
           )
         })
       }
-      <div style={{ height: '400px' }}>
+      <div style={{ height: '400px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '24px' }}>
         {
           flow.data.length <= 0
             ? (
@@ -97,16 +158,9 @@ export const FlowChart: FC<FlowChartProps> = ({
                   style={{ alignSelf: 'center' }}/>
                 <h2 style={{ fontSize: '14px', paddingTop: '4px' }}>No data available for this site.</h2>
               </Stack>)
-            : (
-              <Chart
-                options={{
-                  data,
-                  primaryAxis,
-                  secondaryAxes,
-                  dark: true,
-                  padding: 24,
-                  tooltip: false
-                }} />)
+            : (<Box sx={{ height: '100%' }}>
+              <Line options={options} data={data} />
+            </Box>)
         }
       </div>
       <Divider />
