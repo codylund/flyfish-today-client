@@ -1,7 +1,7 @@
 import { Chip, List, ListItem, TextField } from '@mui/material'
 import React, { type FC } from 'react'
 import { Add } from '@mui/icons-material'
-import { type Site } from '../../models/api/Site'
+import { type Site } from '../../user/sites/models/Site'
 
 interface TagsProps {
   site: Site

@@ -1,10 +1,10 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import { Home } from './ui/Home'
 import React from 'react'
-import { Register } from './ui/Register'
-import { SignIn } from './ui/SignIn'
+import { Register } from './user/register/components/Register'
+import { SignIn } from './user/signin/components/SignIn'
+import { SitesGrid } from './user/sites/components/SitesGrid'
 
 const darkTheme = createTheme({ palette: { mode: 'dark' } })
 
@@ -17,7 +17,7 @@ function App (): JSX.Element {
             <Routes>
               <Route path="signin" element={<SignIn /> } />
               <Route path="register" element={<Register /> } />
-              <Route path="*" element={<Home />} />
+              <Route path="*" element={<SitesGrid />} />
             </Routes>
           </BrowserRouter>
         </header>

@@ -1,12 +1,11 @@
 import { Box, Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, Select, type SelectChangeEvent } from '@mui/material'
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material'
 import React, { type FC, useContext } from 'react'
-import { Filters } from '../../models/Filters'
-import { FiltersContext } from '../../context/FiltersContext'
-import { TagsContext } from '../../context/TagsContext'
+import { Filters } from '../models/Filters'
+import { FiltersContext } from '../context/FiltersContext'
+import { TagsContext } from '../context/TagsContext'
 
 export const FilterMenu: FC = () => {
-  // Filter values.
   const { filters, setFilters } = useContext(FiltersContext)
   const { tags, selectedTags, setSelectedTags } = useContext(TagsContext)
 
@@ -46,6 +45,7 @@ export const FilterMenu: FC = () => {
         <Select
           multiple
           variant='outlined'
+          disabled={tags.length <= 0}
           value={selectedTags}
           onChange={tagSelected}
           labelId='filters-label'

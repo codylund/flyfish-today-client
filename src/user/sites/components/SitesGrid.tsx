@@ -1,22 +1,22 @@
-import { AddSite, DeleteSite, GetSites, UpdateSite } from '../services/UserService'
+import { AddSite, DeleteSite, GetSites, UpdateSite } from '../services/SitesService'
 import React, { type FC } from 'react'
-import { AddSiteButton } from './dialogs/add-site/AddSiteButton'
+import { AddSiteButton } from './AddSiteButton'
 import Box from '@mui/material/Box'
 import { Card } from '@mui/material'
-import { Filters } from '../models/Filters'
-import { FiltersContext } from '../context/FiltersContext'
-import { FlowAppBar } from './navigation/FlowAppBar'
-import { FlowChart } from './charts/FlowChart'
-import { type FlowSeries } from '../models/usgs/FlowSeries'
+import { Filters } from '../../../filters/models/Filters'
+import { FiltersContext } from '../../../filters/context/FiltersContext'
+import { FlowAppBar } from '../../../navigation/components/FlowAppBar'
+import { FlowChart } from '../../../usgs/components/FlowChart'
+import { type FlowSeries } from '../../../usgs/models/FlowSeries'
 import Grid from '@mui/material/Grid'
-import { LoadFlows } from '../services/USGSService'
-import { LoadingBackdrop } from './LoadingBackdrop'
-import { type Site } from '../models/api/Site'
-import { TagsContext } from '../context/TagsContext'
+import { LoadFlows } from '../../../usgs/services/USGSService'
+import { LoadingBackdrop } from '../../../common/components/LoadingBackdrop'
+import { type Site } from '../models/Site'
+import { TagsContext } from '../../../filters/context/TagsContext'
 import { isMobile } from 'react-device-detect'
 import { useNavigate } from 'react-router-dom'
 
-export const Home: FC = () => {
+export const SitesGrid: FC = () => {
   const navigate = useNavigate()
 
   const [loading, setLoading] = React.useState(true)
@@ -57,6 +57,11 @@ export const Home: FC = () => {
       })
   }, [lookback, sites])
 
+  const resetFilters = (): void => {
+    setFilters([])
+    setSelectedTags([])
+  }
+
   const onSiteAdded = (siteId: string): void => {
     setLoading(true)
     // Push site to the DB.
@@ -65,6 +70,7 @@ export const Home: FC = () => {
         console.log('Successfully added site: ' + siteId)
         // Update local cache of sites.
         setSites(sites.concat([site]))
+        resetFilters()
       })
       .catch(e => {
         console.error('Failed to add site.', e.stack)
@@ -77,6 +83,7 @@ export const Home: FC = () => {
       .then(_ => {
         console.log(`Successfully deleted site ${siteId}`)
         setSites(sites.filter(site => site._id !== siteId))
+        resetFilters()
       })
       .catch(err => {
         console.log('Failed to delete site: ', err)
@@ -117,6 +124,7 @@ export const Home: FC = () => {
           }
           return site
         }))
+        resetFilters()
       })
       .catch(err => {
         console.log('Failed to udpate site: ', err)

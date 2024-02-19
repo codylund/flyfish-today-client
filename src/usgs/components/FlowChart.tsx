@@ -1,12 +1,13 @@
+import { Alert, Box, Divider, IconButton, Stack } from '@mui/material'
 import { type AxisOptions, Chart } from 'react-charts'
-import { Box, Divider, IconButton, Stack } from '@mui/material'
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 import React, { type FC } from 'react'
 import { EditMenu } from './EditMenu'
 import ErrorIcon from '@mui/icons-material/Error'
-import { type FlowDataPoint } from '../../models/usgs/FlowDataPoint'
-import { type FlowSeries } from '../../models/usgs/FlowSeries'
-import { type Site } from '../../models/api/Site'
+import { type FlowDataPoint } from '../models/FlowDataPoint'
+import { FlowErrors } from '../../filters/models/FlowErrors'
+import { type FlowSeries } from '../models/FlowSeries'
+import { type Site } from '../../user/sites/models/Site'
 import { Tags } from './Tags'
 
 interface FlowChartProps {
@@ -68,7 +69,23 @@ export const FlowChart: FC<FlowChartProps> = ({
         </Box>
         <EditMenu id={site._id} onDelete={onDeleteSite}/>
       </Box>
-      <Divider />
+      {
+        Array.from(flow.errors).map((error) => {
+          let msg: string
+          if (error === FlowErrors.INVALID_DATA) {
+            msg = 'Chart may contain invalid data.'
+          } else {
+            msg = 'unknown'
+          }
+          return (
+            <Box key={error}>
+              <Alert severity='warning' sx={{ paddingLeft: '24px' }}>
+                {msg}
+              </Alert>
+            </Box>
+          )
+        })
+      }
       <div style={{ height: '400px' }}>
         {
           flow.data.length <= 0

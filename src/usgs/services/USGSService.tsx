@@ -1,7 +1,8 @@
-import { type FlowDataPoint } from '../models/usgs/FlowDataPoint'
-import { type FlowSeries } from '../models/usgs/FlowSeries'
-import { type Site } from '../models/api/Site'
-import { type SiteInfo } from '../models/usgs/SiteInfo'
+import { type FlowDataPoint } from '../models/FlowDataPoint'
+import { FlowErrors } from '../../filters/models/FlowErrors'
+import { type FlowSeries } from '../models/FlowSeries'
+import { type Site } from '../../user/sites/models/Site'
+import { type SiteInfo } from '../models/SiteInfo'
 import axios from 'axios'
 
 interface QueryCriteria {
@@ -170,13 +171,24 @@ export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<F
     const label = series.sourceInfo.siteName
     // Create array to hold all the data points.
     const data: FlowDataPoint[] = []
+    // Create set to hold any errors.
+    const errors = new Set<FlowErrors>()
     // For each value in the series, pull the time and CFS.
     series.values[0].value.forEach(value => {
       const time: Date = new Date(value.dateTime)
       const cfs: number = +value.value
+      if (cfs < 0) {
+        console.log(`Site ${siteId} has invalid value ${cfs}`)
+        errors.add(FlowErrors.INVALID_DATA)
+      }
       data.push({ time, cfs })
     })
-    flows.push({ siteId, location: label, data })
+
+    if (errors.size > 0) {
+      console.log(`Site ${siteId} has errors`)
+    }
+
+    flows.push({ siteId, location: label, data, errors })
   })
 
   // Return the flows.

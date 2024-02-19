@@ -1,13 +1,15 @@
 import { Divider, IconButton } from '@mui/material'
-import { FilterAlt, FilterAltOutlined } from '@mui/icons-material'
-import React, { type FC } from 'react'
+import { FilterAlt, FilterAltOff } from '@mui/icons-material'
+import React, { type FC, useContext } from 'react'
 import Select, { type SelectChangeEvent } from '@mui/material/Select'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
-import { FilterMenu } from '../filter/FilterMenu'
+import { FilterMenu } from '../../filters/components/FilterMenu'
+import { FiltersContext } from '../../filters/context/FiltersContext'
 import { FlowNavigationDrawer } from './FlowNavigationDrawer'
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
+import { TagsContext } from '../../filters/context/TagsContext'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import WaterIcon from '@mui/icons-material/Water'
@@ -20,6 +22,9 @@ export interface FlowAppBarProps {
 export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated }) => {
   const [navigationOpen, setNavigationOpen] = React.useState(false)
   const [showFilters, setShowFilters] = React.useState(false)
+
+  const { setFilters } = useContext(FiltersContext)
+  const { setSelectedTags } = useContext(TagsContext)
 
   const handleChange = (event: SelectChangeEvent): void => {
     const newLookback: number = +event.target.value
@@ -39,6 +44,15 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
       setNavigationOpen(false)
     }
 
+  const toggleFilters = (): void => {
+    // If toggling filters off, hide all the filters.
+    if (showFilters) {
+      setFilters([])
+      setSelectedTags([])
+    }
+    setShowFilters(!showFilters)
+  }
+
   return (
     <Box sx={{ width: '100%', flexGrow: 1 }}>
       <AppBar variant='outlined' elevation={0} position="static">
@@ -49,8 +63,8 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
             Streamflows
           </Typography>
-          <IconButton onClick={() => { setShowFilters(!showFilters) }}>
-            { showFilters ? <FilterAlt /> : <FilterAltOutlined /> }
+          <IconButton onClick={() => { toggleFilters() }}>
+            { showFilters ? <FilterAlt /> : <FilterAltOff /> }
           </IconButton>
           <FormControl>
             <Select

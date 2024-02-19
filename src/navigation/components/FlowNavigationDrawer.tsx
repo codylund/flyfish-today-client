@@ -4,7 +4,7 @@ import React, { type FC } from 'react'
 import Drawer from '@mui/material/Drawer'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { SignOut } from '../../services/UserService'
+import { SignOut } from '../../user/signout/services/SignOutService'
 import SportsBarIcon from '@mui/icons-material/SportsBar'
 import { useNavigate } from 'react-router-dom'
 
