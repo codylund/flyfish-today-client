@@ -1,4 +1,4 @@
-FROM amd64/node:18
+FROM node:18
 
 ENV SERVER_ADDRESS 'https://beta.api.coloradostreamflow.com'
 

@@ -22,6 +22,7 @@ export const AddSiteButton: FC<AddSiteButtonProps> = ({ onSiteAdded }) => {
   return (
     <Box>
       <Fab
+        variant='extended'
         color="primary"
         aria-label="add"
         onClick={handleClickOpen}
@@ -29,7 +30,8 @@ export const AddSiteButton: FC<AddSiteButtonProps> = ({ onSiteAdded }) => {
           alignSelf: 'end',
           marginBottom: '16px'
         }}>
-        <AddIcon />
+        <AddIcon sx={{ mr: 1 }} />
+        Add Site
       </Fab>
       <AddSiteDialog open={open} onSiteAdded={onSiteAdded} onClose={handleClose} />
     </Box>
