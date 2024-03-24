@@ -32,8 +32,8 @@ ChartJS.register(
 )
 
 interface FlowChartProps {
-  flow: FlowSeries
   site: Site
+  flow: FlowSeries
   onDeleteSite: (id: string) => void
   onSetFavorite: (id: string, isFavorite: boolean) => void
   onTagsUpdated: (id: string, tags: string[]) => void
@@ -41,8 +41,8 @@ interface FlowChartProps {
 
 // you can choose annotate the return type so an error is raised if you accidentally return some other type
 export const FlowChart: FC<FlowChartProps> = ({
-  flow,
   site,
+  flow,
   onDeleteSite,
   onSetFavorite,
   onTagsUpdated
@@ -96,20 +96,40 @@ export const FlowChart: FC<FlowChartProps> = ({
           lineWidth: 1,
           color: '#333333'
         }
+      },
+      y1: {
+        type: 'linear' as const,
+        display: true,
+        position: 'right' as const,
+        title: {
+          display: true,
+          text: 'Gauge Height, feet' as const
+        },
+        grid: {
+          drawOnChartArea: false
+        }
       }
     }
   }
 
-  const labels = flow.data.map(datum => datum.time)
+  const location = flow.location
+  const labels = flow.cfs.map(datum => datum.time)
   const data = {
     labels,
     datasets: [
       {
-        label: 'CFS',
-        data: flow.data.map(datum => datum.cfs),
+        label: 'CFS, cubic ft/s',
+        data: flow.cfs.map(datum => datum.datum),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         yAxisID: 'y'
+      },
+      {
+        label: 'Gauge Height, feet',
+        data: flow.gaugeHt.map(datum => datum.datum),
+        borderColor: 'rgb(41, 118, 242)',
+        backgroundColor: 'rgba(41, 118, 242, 0.5)',
+        yAxisID: 'y1'
       }
     ]
   }
@@ -118,7 +138,7 @@ export const FlowChart: FC<FlowChartProps> = ({
     <div>
       <Box sx={{ display: 'flex', p: 1 }}>
         <Box sx={{ flexGrow: 1, paddingLeft: '16px', paddingBottom: '0' }}>
-          <h1 style={{ fontSize: '18px', textAlign: 'left' }}>{flow.location}</h1>
+          <h1 style={{ fontSize: '18px', textAlign: 'left' }}>{location}</h1>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton onClick={() => {
@@ -131,7 +151,7 @@ export const FlowChart: FC<FlowChartProps> = ({
         <EditMenu id={site._id} onDelete={onDeleteSite}/>
       </Box>
       {
-        Array.from(flow.errors).map((error) => {
+        Array.from(flow.errors).map(error => {
           let msg: string
           if (error === FlowErrors.INVALID_DATA) {
             msg = 'Chart may contain invalid data.'
@@ -149,7 +169,7 @@ export const FlowChart: FC<FlowChartProps> = ({
       }
       <div style={{ height: '400px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '24px' }}>
         {
-          flow.data.length <= 0
+          flow.cfs.length <= 0 && flow.gaugeHt.length <= 0
             ? (
               <Stack>
                 <ErrorIcon

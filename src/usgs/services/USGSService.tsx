@@ -114,19 +114,21 @@ interface Method {
   methodID: number
 }
 
+interface TimeSeriesValues {
+  value: Value[]
+  qualifier: Qualifier[]
+  qualityControlLevel: any[]
+  method: Method[]
+  source: any[]
+  offset: any[]
+  sample: any[]
+  censorCode: any[]
+}
+
 interface TimeSeries {
   sourceInfo: SourceInfo
   variable: Variable
-  values: [{
-    value: Value[]
-    qualifier: Qualifier[]
-    qualityControlLevel: any[]
-    method: Method[]
-    source: any[]
-    offset: any[]
-    sample: any[]
-    censorCode: any[]
-  }]
+  values: TimeSeriesValues[]
   name: string
 }
 
@@ -149,7 +151,7 @@ export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<F
         format: 'json',
         sites: sites.map(site => site.site_id).join(','),
         // Code for cfs.
-        parameterCd: '00060',
+        parameterCd: '00060,00065',
         siteStatus: 'all',
         period: `P${lookbackDays}D`
       }
@@ -164,31 +166,52 @@ export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<F
   const flows: FlowSeries[] = []
 
   // For each series in the response.
-  result.data.value.timeSeries.forEach(series => {
-    const siteId = series.sourceInfo.siteCode[0].value
-    console.log(`Loaded site with id: ${siteId}`)
+  sites.forEach(site => {
+    const timeSeries = result.data.value.timeSeries.filter(series => {
+      const siteId = series.sourceInfo.siteCode[0].value
+      return site.site_id === siteId
+    })
+
     // Pull the site name for the label.
-    const label = series.sourceInfo.siteName
+    const label = timeSeries[0].sourceInfo.siteName
+
     // Create array to hold all the data points.
-    const data: FlowDataPoint[] = []
+    const cfs: FlowDataPoint[] = []
+    const gaugeHt: FlowDataPoint[] = []
+
     // Create set to hold any errors.
     const errors = new Set<FlowErrors>()
-    // For each value in the series, pull the time and CFS.
-    series.values[0].value.forEach(value => {
-      const time: Date = new Date(value.dateTime)
-      const cfs: number = +value.value
-      if (cfs < 0) {
-        console.log(`Site ${siteId} has invalid value ${cfs}`)
-        errors.add(FlowErrors.INVALID_DATA)
-      }
-      data.push({ time, cfs })
+
+    timeSeries.forEach(timeSeries => {
+      const variableCode = timeSeries.variable.variableCode[0].value
+      timeSeries.values[0].value.forEach(value => {
+        const time: Date = new Date(value.dateTime)
+        const datum: number = +value.value
+        if (datum < 0) {
+          console.log(`Site ${site.site_id} has invalid value ${datum}`)
+          errors.add(FlowErrors.INVALID_DATA)
+        }
+        if (variableCode === '00060') {
+          cfs.push({ time, datum })
+        } else if (variableCode === '00065') {
+          gaugeHt.push({ time, datum })
+        } else {
+          console.log(`Uknown variable code: ${variableCode}`)
+        }
+      })
     })
 
     if (errors.size > 0) {
-      console.log(`Site ${siteId} has errors`)
+      console.log(`Site ${site.site_id} has errors`)
     }
 
-    flows.push({ siteId, location: label, data, errors })
+    flows.push({
+      siteId: site.site_id,
+      location: label,
+      cfs,
+      gaugeHt,
+      errors
+    })
   })
 
   // Return the flows.

@@ -4,6 +4,7 @@ import { type FlowErrors } from '../../filters/models/FlowErrors'
 export interface FlowSeries {
   siteId: string
   location: string
-  data: FlowDataPoint[]
+  cfs: FlowDataPoint[]
+  gaugeHt: FlowDataPoint[]
   errors: Set<FlowErrors>
 }

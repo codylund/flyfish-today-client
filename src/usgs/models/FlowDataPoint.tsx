@@ -1,4 +1,4 @@
 export interface FlowDataPoint {
   time: Date
-  cfs: number
+  datum: number
 }
