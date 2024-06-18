@@ -6,5 +6,8 @@ export interface FlowSeries {
   location: string
   cfs: FlowDataPoint[]
   gaugeHt: FlowDataPoint[]
+  yearlyP25: number
+  yearlyP50: number
+  yearlyP75: number
   errors: Set<FlowErrors>
 }

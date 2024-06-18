@@ -79,6 +79,7 @@ export const FlowAppBar: FC<FlowAppBarProps> = ({ lookback, onLookbackUpdated })
               <MenuItem value={1}>1d</MenuItem>
               <MenuItem value={7}>7d</MenuItem>
               <MenuItem value={14}>14d</MenuItem>
+              <MenuItem value={30}>30d</MenuItem>
             </Select>
           </FormControl>
         </Toolbar>

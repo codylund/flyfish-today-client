@@ -12,6 +12,7 @@ import {
 } from 'chart.js'
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 import React, { type FC } from 'react'
+import { type AnnotationOptions } from 'chartjs-plugin-annotation/types/options'
 import { EditMenu } from './EditMenu'
 import ErrorIcon from '@mui/icons-material/Error'
 import { FlowErrors } from '../../filters/models/FlowErrors'
@@ -20,6 +21,7 @@ import { Line } from 'react-chartjs-2'
 
 import { type Site } from '../../user/sites/models/Site'
 import { Tags } from './Tags'
+import annotationPlugin from 'chartjs-plugin-annotation'
 
 ChartJS.register(
   LinearScale,
@@ -28,8 +30,12 @@ ChartJS.register(
   TimeScale,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  annotationPlugin
 )
+
+const cfsLabel = 'Volume, ft³/s'
+const gaugeHtLabel = 'Gauge Height, ft'
 
 interface FlowChartProps {
   site: Site
@@ -49,6 +55,23 @@ export const FlowChart: FC<FlowChartProps> = ({
 }) => {
   const [isFavorite, setFavorite] = React.useState(site.is_favorite)
 
+  const median: AnnotationOptions = {
+    type: 'line',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderDash: [5, 5],
+    scaleID: 'y',
+    value: flow.yearlyP50
+  }
+
+  const quartiles: AnnotationOptions = {
+    // Indicates the type of annotation
+    type: 'box',
+    yMin: flow.yearlyP25,
+    yMax: flow.yearlyP75,
+    backgroundColor: 'rgba(90, 187, 0, 0.25)'
+  }
+
   const options = {
     responsive: true,
     interaction: {
@@ -59,6 +82,12 @@ export const FlowChart: FC<FlowChartProps> = ({
       title: {
         display: false,
         text: flow.location
+      },
+      annotation: {
+        annotations: {
+          median,
+          quartiles
+        }
       }
     },
     elements: {
@@ -89,7 +118,7 @@ export const FlowChart: FC<FlowChartProps> = ({
         position: 'left' as const,
         title: {
           display: true,
-          text: 'CFS' as const
+          text: cfsLabel
         },
         grid: {
           drawBorder: true,
@@ -103,7 +132,7 @@ export const FlowChart: FC<FlowChartProps> = ({
         position: 'right' as const,
         title: {
           display: true,
-          text: 'Gauge Height, feet' as const
+          text: gaugeHtLabel
         },
         grid: {
           drawOnChartArea: false
@@ -118,14 +147,14 @@ export const FlowChart: FC<FlowChartProps> = ({
     labels,
     datasets: [
       {
-        label: 'CFS, cubic ft/s',
+        label: cfsLabel,
         data: flow.cfs.map(datum => datum.datum),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         yAxisID: 'y'
       },
       {
-        label: 'Gauge Height, feet',
+        label: gaugeHtLabel,
         data: flow.gaugeHt.map(datum => datum.datum),
         borderColor: 'rgb(41, 118, 242)',
         backgroundColor: 'rgba(41, 118, 242, 0.5)',

@@ -1,5 +1,5 @@
 import { type FlowDataPoint } from '../models/FlowDataPoint'
-import { FlowErrors } from '../../filters/models/FlowErrors'
+import { type FlowErrors } from '../../filters/models/FlowErrors'
 import { type FlowSeries } from '../models/FlowSeries'
 import { type Site } from '../../user/sites/models/Site'
 import { type SiteInfo } from '../models/SiteInfo'
@@ -144,61 +144,43 @@ interface JSONBlob {
 
 export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<FlowSeries[]> {
   // Query the latest flows.
-  const result = await axios.get<JSONBlob>(
-    'https://waterservices.usgs.gov/nwis/iv/',
-    {
-      params: {
-        format: 'json',
-        sites: sites.map(site => site.site_id).join(','),
-        // Code for cfs.
-        parameterCd: '00060,00065',
-        siteStatus: 'all',
-        period: `P${lookbackDays}D`
-      }
-    }
-  )
-
-  if (result.status !== 200) {
-    throw new Error(`Failed to get flow data. Code: ${result.status}`)
-  }
+  const iv = await LoadInstantValues(lookbackDays, sites)
+  const dv = await LoadDailyValues(365, sites)
 
   // Create array to hold the simplified data series.
   const flows: FlowSeries[] = []
 
   // For each series in the response.
   sites.forEach(site => {
-    const timeSeries = result.data.value.timeSeries.filter(series => {
+    const ivTimeSeries = iv.value.timeSeries.filter(series => {
+      const siteId = series.sourceInfo.siteCode[0].value
+      return site.site_id === siteId
+    })
+
+    const dvTimeSeries = dv.value.timeSeries.filter(series => {
       const siteId = series.sourceInfo.siteCode[0].value
       return site.site_id === siteId
     })
 
     // Pull the site name for the label.
-    const label = timeSeries[0].sourceInfo.siteName
+    const label = ivTimeSeries[0].sourceInfo.siteName
 
     // Create array to hold all the data points.
-    const cfs: FlowDataPoint[] = []
-    const gaugeHt: FlowDataPoint[] = []
+    var cfs: FlowDataPoint[] = []
+    var gaugeHt: FlowDataPoint[] = []
 
     // Create set to hold any errors.
     const errors = new Set<FlowErrors>()
 
-    timeSeries.forEach(timeSeries => {
+    ivTimeSeries.forEach(timeSeries => {
       const variableCode = timeSeries.variable.variableCode[0].value
-      timeSeries.values[0].value.forEach(value => {
-        const time: Date = new Date(value.dateTime)
-        const datum: number = +value.value
-        if (datum < 0) {
-          console.log(`Site ${site.site_id} has invalid value ${datum}`)
-          errors.add(FlowErrors.INVALID_DATA)
-        }
-        if (variableCode === '00060') {
-          cfs.push({ time, datum })
-        } else if (variableCode === '00065') {
-          gaugeHt.push({ time, datum })
-        } else {
-          console.log(`Uknown variable code: ${variableCode}`)
-        }
-      })
+      if (variableCode === '00060') {
+        cfs = ToFlowData(timeSeries.values[0])
+      } else if (variableCode === '00065') {
+        gaugeHt = ToFlowData(timeSeries.values[0])
+      } else {
+        console.log(`Uknown variable code: ${variableCode}`)
+      }
     })
 
     if (errors.size > 0) {
@@ -210,12 +192,75 @@ export async function LoadFlows (lookbackDays: number, sites: Site[]): Promise<F
       location: label,
       cfs,
       gaugeHt,
+      yearlyP25: ComputePercentile(ToFlowData(dvTimeSeries[0].values[0]), 25),
+      yearlyP50: ComputePercentile(ToFlowData(dvTimeSeries[0].values[0]), 50),
+      yearlyP75: ComputePercentile(ToFlowData(dvTimeSeries[0].values[0]), 75),
       errors
     })
   })
 
   // Return the flows.
   return flows
+}
+
+async function LoadInstantValues (lookbackDays: number, sites: Site[]): Promise<JSONBlob> {
+  const result = await axios.get<JSONBlob>(
+    'https://waterservices.usgs.gov/nwis/iv/',
+    {
+      params: {
+        format: 'json',
+        sites: sites.map(site => site.site_id).join(','),
+        // Code for cfs and gauge height.
+        parameterCd: '00060,00065',
+        siteStatus: 'all',
+        period: `P${lookbackDays}D`
+      }
+    }
+  )
+
+  if (result.status !== 200) {
+    throw new Error(`Failed to get flow data. Code: ${result.status}`)
+  }
+
+  return result.data
+}
+
+async function LoadDailyValues (lookbackDays: number, sites: Site[]): Promise<JSONBlob> {
+  const result = await axios.get<JSONBlob>(
+    'https://waterservices.usgs.gov/nwis/dv/',
+    {
+      params: {
+        format: 'json',
+        sites: sites.map(site => site.site_id).join(','),
+        // Code for cfs.
+        parameterCd: '00060',
+        siteStatus: 'all',
+        period: `P${lookbackDays}D`
+      }
+    }
+  )
+
+  if (result.status !== 200) {
+    throw new Error(`Failed to get flow data. Code: ${result.status}`)
+  }
+
+  return result.data
+}
+
+function ToFlowData (values: TimeSeriesValues): FlowDataPoint[] {
+  const flowData: FlowDataPoint[] = []
+  values.value.forEach(value => {
+    const time: Date = new Date(value.dateTime)
+    const datum: number = +value.value
+    if (datum >= 0) {
+      flowData.push({ time, datum })
+    }
+  })
+  return flowData
+}
+
+function ComputePercentile (cfs: FlowDataPoint[], percentile: number): number {
+  return cfs.sort((a, b) => a.datum - b.datum).at(cfs.length * percentile / 100)?.datum ?? 0
 }
 
 export async function LoadActiveSites (): Promise<SiteInfo[]> {
