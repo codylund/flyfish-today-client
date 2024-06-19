@@ -1,6 +1,6 @@
 FROM node:18
 
-ENV REACT_APP_SERVER_ADDRESS 'https://beta.api.coloradostreamflow.com'
+ENV REACT_APP_SERVER_ADDRESS 'https://api.flyfish.today'
 
 # Set this new directory as our working directory for subsequent instructions
 WORKDIR /app
