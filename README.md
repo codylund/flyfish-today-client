@@ -1,79 +1,66 @@
-# Stream Flows
+# [flyfish.today] client
 
-Streams Flows is a React web app that visualizes recent historical USGS streamflow data. 
-The intended use case is for planning fly fishing trips in Colorado, but this app could
-be useful for any stream-based activity (e.g. rafting, swimming).
+[flyfish.today] is a customizable dashboard for historical and realtime streamflow data. 
+This repository contains the frontend component for the dashboard.
+The backend component, built with Go and Gin, can be found [here][flyfish-today-server].
 
-## Limitations
+## Technology
 
-### Restricted site locations
+The flyfish.today client is a [React] web app written in [Typescript](https://www.typescriptlang.org/).
+It was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
 
-Today, the `AddSiteDialog` only shows USGS sites in CO. However, this app can render data from 
-any active USGS site in the United States.
+The bulk of UX is comprised of [Material UI] components.
+Streamflow data is rendered with [Chart.js].
 
-Until `AddSiteDialog` is expanded to include sites beyond CO, users can add them by finding the
-corresponding site ID via https://maps.waterdata.usgs.gov/mapper/index.html and adding a new `site` 
-query paramater to the app URL. 
+## Data
 
-For example, the site [RIO GRANDE AT STATE HWY 346 NEAR BOSQUE, NM](https://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no=08331510) 
-can be manually added by appending `&site=08331510` to the app URL.
+The [flyfish.today] dashboard is fully customizable.
+Registered users can select preferred USGS stream sites and add metadata (e.g. favorite, tags).
+User data is persisted and retreived via REST APIs on the [flyfish.today server][flyfish-today-server].
+Refer to the documentation in that repo for detailed API information.
 
-## Tecnical details
+The client retreives streamflow data via cross-origin requests to the following USGS REST APIs:
+- [USGS Instantaneous Values Web Service](https://waterservices.usgs.gov/rest/IV-Service.html)
+- [USGS Daily Values Site Web Service](https://waterservices.usgs.gov/rest/DV-Service.html)
 
-- Retreives live streamflow data from the following USGS REST APIs:
-    - [USGS Instantaneous Values Web Service](https://waterservices.usgs.gov/rest/IV-Service.html)
-    - [USGS Daily Values Site Web Service](https://waterservices.usgs.gov/rest/DV-Service.html)
-- Written in [Typescript](https://www.typescriptlang.org/)
-- Uses [ESLint](https://eslint.org/) for static analysis
-- Bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
-- Client-only app served using [GitHub Pages](https://pages.github.com/)
-
-## Architecture
-
-This is a client application that consumes data from independent USGS REST APIs. There are no custom
-backend components.
-
-When a user adds a new USGS site, it is added as a `site` query parameter on the URL. 
-Users can bookmark the updated URL to view at a later time.
-
-## Available Scripts
+## Build and Test
 
 In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Runs the app in the development mode.
+Open <http://localhost:3000> to view it in the browser.
+A local [flyfish.today server][flyfish-today-server] must be listening on <http://localhost:8080>
+for the client to function properly.
 
-The page will reload if you make edits.\
+The page will reload if you make edits.
 You will also see any lint errors in the console.
-
-### `npm run deploy`
-
-Deploys the app to GitHub pages.\
-Open https://codylund.github.io/stream-flows/ to view it in the browser.
-
-This is a production endpoint. All release candidates should be thuroughly tested before deployment.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-Note: there are currently no tests in this project.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
+Builds the app for production to the `build` folder.
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Deploy
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The flyfish.today client is deployed as a standalone Docker container.
+See the [Dockerfile](./Dockerfile) included in this repo.
 
-## Learn More
+This container uses [`serve`] to deliver the static assets via HTTP.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Limitations
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Restricted site locations
+
+Today, the `AddSiteDialog` only shows USGS sites in Colorado.
+However, this app can render data from any active USGS site in the United States.
+A future update may add support for different states.
+
+[flyfish.today]: https://flyfish.today
+[flyfish-today-server]: https://github.com/codylund/flyfish-today-server
+
+[Chart.js]: https://www.chartjs.org/
+[Material UI]: https://mui.com/material-ui/
+[React]: https://react.dev/
+[`serve`]: https://github.com/vercel/serve#readme
